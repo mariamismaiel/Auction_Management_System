@@ -1,0 +1,150 @@
+CREATE SEQUENCE CATEGORYID
+  INCREMENT BY 1 
+  START WITH 0 
+  MINVALUE 0
+
+CREATE SEQUENCE ITEM_ID
+  INCREMENT BY 1 
+  START WITH 0 
+  MINVALUE 0
+
+CREATE SEQUENCE user_id
+  INCREMENT BY 1 
+  START WITH 0 
+  MINVALUE 0
+
+CREATE TABLE categories
+( CATEGORYID number(6) NOT NULL primary key,
+  CATEGORYNAME VARCHAR2(264) NOT NULL
+)
+
+INSERT INTO categories (CATEGORYID, CATEGORYNAME)
+VALUES (CATEGORYID.nextval,'cars' );
+
+INSERT INTO categories (CATEGORYID, CATEGORYNAME)
+VALUES (CATEGORYID.nextval,'furniture' );
+
+INSERT INTO categories (CATEGORYID, CATEGORYNAME)
+VALUES (CATEGORYID.nextval,'jewelery' );
+
+INSERT INTO categories (CATEGORYID, CATEGORYNAME)
+VALUES (CATEGORYID.nextval,'antiques' );
+
+INSERT INTO categories (CATEGORYID, CATEGORYNAME)
+VALUES (CATEGORYID.nextval,'paintings' );
+
+INSERT INTO categories (CATEGORYID, CATEGORYNAME)
+VALUES (CATEGORYID.nextval,'clothes' );
+
+CREATE TABLE Users
+( user_id INT NOT NULL primary key,
+  email VARCHAR2(264) NOT NULL,
+  password_email VARCHAR2(20)
+)
+
+INSERT INTO users (USER_ID, EMAIL, PASSWORD_EMAIL)
+VALUES (user_id.nextval, 'som3aa@gmail.com','1379586');
+
+INSERT INTO users (USER_ID, EMAIL, PASSWORD_EMAIL)
+VALUES (user_id.nextval, 'rew@gmail.com','41683');
+
+INSERT INTO users (USER_ID, EMAIL, PASSWORD_EMAIL)
+VALUES (user_id.nextval, 'weirdo@gmail.com','68762');
+
+INSERT INTO users (USER_ID, EMAIL, PASSWORD_EMAIL)
+VALUES (user_id.nextval, 'hoss@gmail.com','1323');
+
+INSERT INTO users (USER_ID, EMAIL, PASSWORD_EMAIL)
+VALUES (user_id.nextval, 'mai@gmail.com','100125');
+
+INSERT INTO users (USER_ID, EMAIL, PASSWORD_EMAIL)
+VALUES (user_id.nextval, 'mostafa@gmail.com','100126');
+
+CREATE TABLE Auction_items
+( item_id number(6)not null primary key,
+  item_name VARCHAR(50)not null,
+  initial_price number(6) not null,
+  current_price number(6),
+  seller_id number(6),
+  FOREIGN KEY(seller_id) REFERENCES users (user_id),
+  buyer_id number(6),
+  FOREIGN KEY(buyer_id) REFERENCES users (user_id),
+  deadline date,
+  categoryid number(6),
+  FOREIGN KEY(categoryid) REFERENCES categories (categoryid),
+  auction_status VARCHAR2(264)
+)
+
+INSERT INTO auction_items (ITEM_ID,ITEM_NAME,CURRENT_PRICE,SELLER_ID,buyer_id,DEADLINE,CATEGORYID, auction_status,initial_price)
+VALUES (item_id.nextval,'2-Person bed',9000,2,3,'15-JUN-22',2,'finished', 3000);
+
+INSERT INTO auction_items (ITEM_ID,ITEM_NAME,CURRENT_PRICE,SELLER_ID,buyer_id,DEADLINE,CATEGORYID, auction_status,initial_price)
+VALUES (item_id.nextval,'BMW',100000,3,2,'30-JUN-22',1,'finished', 30000);
+
+INSERT INTO auction_items (ITEM_ID,ITEM_NAME,CURRENT_PRICE,SELLER_ID,DEADLINE,CATEGORYID, auction_status,initial_price)
+VALUES (item_id.nextval,'necklace',1000,1,'30-SEP-22',3,'pending', 1000);
+
+INSERT INTO auction_items (ITEM_ID,ITEM_NAME,CURRENT_PRICE,SELLER_ID,DEADLINE,CATEGORYID, auction_status,initial_price)
+VALUES (item_id.nextval,'Porsche',300000,1,'30-JUN-23',1,'pending', 15645);
+
+INSERT INTO auction_items (ITEM_ID,ITEM_NAME,CURRENT_PRICE,SELLER_ID,DEADLINE,CATEGORYID, auction_status,initial_price)
+VALUES (item_id.nextval,'BMW',200000,1,'30-OCT-23',1,'pending', 50000);
+
+INSERT INTO auction_items (ITEM_ID,ITEM_NAME,CURRENT_PRICE,SELLER_ID,DEADLINE,CATEGORYID, auction_status,initial_price)
+VALUES (item_id.nextval,'Nissan',200000,1,'30-JAN-22',1,'pending', 100000);
+
+INSERT INTO auction_items (ITEM_ID,ITEM_NAME,CURRENT_PRICE,SELLER_ID,DEADLINE,CATEGORYID, auction_status,initial_price)
+VALUES (item_id.nextval,'dress',50000,3,'16-DEC-22',6,'pending', 10000);
+
+CREATE TABLE users_history
+( item_id INT NOT NULL,
+  user_id INT NOT NULL,
+  user_type varchar(264),
+  primary key(item_id, user_id)
+)
+
+
+INSERT INTO users_history (item_id, user_id, user_type)
+values (1,2,'seller')
+
+INSERT INTO users_history (item_id, user_id, user_type)
+values (2,2,'buyer')
+
+INSERT INTO users_history (item_id, user_id, user_type)
+values (3,1,'seller')
+
+INSERT INTO users_history (item_id, user_id, user_type)
+values (1,3,'buyer')
+
+INSERT INTO users_history (item_id, user_id, user_type)
+values (2,3,'seller')
+
+INSERT INTO users_history (item_id, user_id, user_type)
+values (4,1,'seller')
+
+INSERT INTO users_history (item_id, user_id, user_type)
+values (5,1,'seller')
+
+===============================
+create or replace PROCEDURE GETCURRENTPRICE
+( idIn IN NUMBER
+, currprice OUT NUMBER
+) AS
+BEGIN
+  SELECT CURRENT_PRICE into currprice FROM auction_items WHERE item_id = idIn;
+END GETCURRENTPRICE;
+=============================================
+create or replace
+PROCEDURE UPDATESTATUS AS
+BEGIN
+UPDATE AUCTION_ITEMS set AUCTION_STATUS='finished' where deadline<SYSDATE ;
+END UPDATESTATUS;
+===============================================
+create or replace
+PROCEDURE GETITEMCAT
+(
+ listOFitems OUT SYS_refcursor
+) AS
+BEGIN
+open listofitems for select categoryname from categories;
+END GETITEMCAT;
